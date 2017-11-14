@@ -1,0 +1,28 @@
+CREATE OR REPLACE FUNCTION onlineexam.percentile(examid integer, studentid integer)
+  RETURNS real AS
+$BODY$
+DECLARE
+percentile numeric(5,2);
+x integer := 1;
+y integer;
+totalStudents integer;
+aid integer;
+c1 CURSOR(eid integer) for SELECT studid FROM registration as r where r.examid = eid ORDER BY r.result DESC;
+BEGIN
+SELECT count(studentID) into totalStudents FROM registration as r WHERE r.examid = examid;
+open c1(examid);
+Loop
+fetch c1 into aid;
+exit when not found;
+IF aid = studentid THEN
+y = x;		
+end if;
+x = x + 1;
+END LOOP;
+close c1;
+percentile = (totalStudents-y)*100/totalStudents;
+return percentile;
+END $BODY$
+LANGUAGE plpgsql
+
+
