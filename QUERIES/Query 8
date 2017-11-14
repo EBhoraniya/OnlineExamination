@@ -1,0 +1,7 @@
+name of problem setter who set maximum problems in maths
+
+
+Ans : select name as settername from
+(select count(questionid) as total ,setterid from question as a join subject as b
+on a.subjectid=b.subjectid and subname='maths' group by setterid order by total desc limit 1)as z
+natural join setter
