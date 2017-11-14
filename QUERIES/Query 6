@@ -1,0 +1,13 @@
+Name of supervisors and block number of center of rajkot having maximum avg marks of students of JEE Main on 1st April, 2015
+
+
+Ans : select name ,blockno from
+(select avg(result) , centerid from
+(select * from
+(select studid , b.examid from registration as a  join exam as b on examdate='2015-04-01' and a.examid=b.examid)as e
+natural join 
+(select centerid , examid from center as c join address as d on c.addressid=d.addressid and city = 'Rajkot' natural join conductedat )as f) as g
+natural join assignedto natural join registration group by centerid order by avg desc limit 1) as h
+natural join supervisedby natural join supervisor
+
+
