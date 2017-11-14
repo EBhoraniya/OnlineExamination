@@ -1,0 +1,11 @@
+Question setters’ name of first 5 hard questions of physics of JEE Main 2015 
+
+
+Ans : select name as settername from
+(select count(studid),d.questionid from
+(select * from
+(select EXTRACT (YEAR FROM examdate) as y,examid  from exam) as a
+ join qset as b on y=2015 and a.examid=b.examid)as c
+ natural join responsesto  join question as d on correctoption!=response join subject
+ on subname='physics' group by d.questionid order by count desc limit 5) as z
+ natural join question natural join setter
