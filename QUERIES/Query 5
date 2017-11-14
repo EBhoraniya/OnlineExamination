@@ -1,0 +1,9 @@
+School with maximum number of students who could clear the cutoff in JEE Main 2015
+
+Ans : select schoolname from
+(select count(studentid)as c, schoolcode from
+(select studid as studentid, result from
+(select EXTRACT (YEAR FROM examdate) as y,examid  from exam ) as a join registration as b on a.examid=b.examid and y='2015')as c
+natural join student natural join category join cutoff on result >= cutoffmarks group by schoolcode order by c desc limit 1 ) as e 
+natural join school 
+
