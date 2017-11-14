@@ -1,0 +1,226 @@
+
+CREATE SCHEMA OnlineExam
+SET SEARCH_PATH TO OnlineExam
+
+CREATE TABLE category (
+	categoryid INTEGER,
+	categoryname VARCHAR(20),
+	PRIMARY KEY (categoryid)
+);
+
+CREATE TABLE address (
+	addressid INTEGER,
+	street VARCHAR(100),
+	city VARCHAR(100),
+	district VARCHAR(100),
+	state VARCHAR(100),
+	pin VARCHAR(100),
+	PRIMARY KEY (addressid)
+);
+
+CREATE TABLE school (
+	schoolcode INTEGER,
+	schoolname VARCHAR(20),
+	addressid INTEGER,
+	PRIMARY KEY (schoolcode),
+	FOREIGN KEY (addressid) REFERENCES address(addressid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE
+);
+
+CREATE TABLE student (
+	studid INTEGER,
+	fname VARCHAR(20),
+	mname VARCHAR(20),
+	lname VARCHAR(20),
+	dob DATE,
+	email VARCHAR(40),
+	contactno VARCHAR(16),
+	gender CHAR(1),
+	categoryid INTEGER,
+	schoolcode INTEGER,
+	passwd VARCHAR(20),
+	addressid INTEGER,
+	
+	PRIMARY KEY (studid),
+	FOREIGN KEY (categoryid) REFERENCES category(categoryid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE,
+	
+	FOREIGN KEY (schoolcode) REFERENCES school(schoolcode)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE,
+	
+	FOREIGN KEY (addressid) REFERENCES address(addressid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE
+	
+);
+
+CREATE TABLE exam (
+	examid INTEGER,
+	examdate DATE,
+	starttime TIME,
+	PRIMARY KEY (examid)
+);
+
+CREATE TABLE registration (
+	examid INTEGER,
+	studid INTEGER,
+	result INTEGER,
+	
+	PRIMARY KEY (examid,studid),
+	FOREIGN KEY (examid) REFERENCES exam(examid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE,
+	FOREIGN KEY (studid) REFERENCES student(studid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE
+);
+CREATE TABLE setter(
+	setterid INTEGER,
+	name VARCHAR(100),
+	gender CHAR(1),
+	schoolcode INTEGER,
+	addressid INTEGER,
+	
+	PRIMARY KEY (setterid),
+	FOREIGN KEY (addressid) REFERENCES address(addressid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE,
+	FOREIGN KEY (schoolcode) REFERENCES school(schoolcode)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE
+);
+CREATE TABLE subject(
+	subjectid INTEGER,
+	subname VARCHAR(20),
+	PRIMARY KEY (subjectid)
+);
+
+
+CREATE TABLE question(
+	questionid INTEGER,
+	conten VARCHAR(100),
+	A VARCHAR(100),
+	B VARCHAR(100),
+	C VARCHAR(100),
+	D VARCHAR(100),
+	correctoption CHAR(1),
+	setterid INTEGER,
+	subjectid INTEGER,
+
+	PRIMARY KEY (questionid),
+	FOREIGN KEY (setterid) REFERENCES setter(setterid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE,
+	FOREIGN KEY (subjectid) REFERENCES subject(subjectid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE
+);
+
+
+
+CREATE TABLE qset(
+	setid INTEGER,
+	setcode CHAR(1),
+	index INTEGER,
+	questionid INTEGER,
+	examid INTEGER,
+	PRIMARY KEY (setid,setcode,index),
+	FOREIGN KEY (examid) REFERENCES exam(examid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE,
+	FOREIGN KEY (questionid) REFERENCES question(questionid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE
+);
+
+
+CREATE TABLE cutoff(
+	examid INTEGER,
+	categoryid INTEGER,
+	cutoffmarks INTEGER,
+
+	PRIMARY KEY (examid,categoryid),
+	FOREIGN KEY (examid) REFERENCES exam(examid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE,
+	FOREIGN KEY (categoryid) REFERENCES category(categoryid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE
+);
+
+CREATE TABLE center (
+	centerid INTEGER,
+	centername VARCHAR(20),
+	addressid INTEGER,
+	capacity INTEGER,
+	PRIMARY KEY (centerid),
+	FOREIGN KEY (addressid) REFERENCES address(addressid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE
+);
+
+CREATE TABLE conductedat (
+	examid INTEGER,
+	centerid INTEGER,
+	
+	PRIMARY KEY (examid,centerid),
+	FOREIGN KEY (examid) REFERENCES exam(examid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE,
+	FOREIGN KEY (centerid) REFERENCES center(centerid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE
+);
+
+CREATE TABLE assignedto (
+	examid INTEGER,
+	centerid INTEGER,
+	studid INTEGER,
+	seatno INTEGER,
+	blockno INTEGER,
+	
+	PRIMARY KEY (studid,centerid,examid),
+	FOREIGN KEY (studid) REFERENCES student(studid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE,
+	
+	FOREIGN KEY (examid) REFERENCES exam(examid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE,
+	
+	FOREIGN KEY (centerid) REFERENCES center(centerid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE
+	
+);
+
+
+CREATE TABLE supervisor(
+	supervisorid INTEGER,
+	name VARCHAR(100),
+	gender CHAR(1),
+	contactno VARCHAR(16),
+	addressid INTEGER,
+	
+	PRIMARY KEY (supervisorid),
+	FOREIGN KEY (addressid) REFERENCES address(addressid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE
+);
+
+CREATE TABLE supervisedby (
+	examid INTEGER,
+	centerid INTEGER,
+	supervisorid INTEGER,
+	blockno INTEGER,
+	
+	PRIMARY KEY (supervisorid,centerid,examid),
+	FOREIGN KEY (supervisorid) REFERENCES supervisor(supervisorid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE,
+	
+	FOREIGN KEY (examid) REFERENCES exam(examid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE,
+	
+	FOREIGN KEY (centerid) REFERENCES center(centerid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE	
+);
+
+CREATE TABLE responsesto (
+	studid INTEGER,
+	setid INTEGER,
+	setcode CHAR(1),
+	index INTEGER,
+	response CHAR(1),
+	
+	PRIMARY KEY (studid,setid,setcode,index),
+	FOREIGN KEY (studid) REFERENCES student(studid)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE,
+	
+	FOREIGN KEY (setid,setcode,index) REFERENCES qset(setid,setcode,index)
+	ON DELETE SET DEFAULT ON UPDATE CASCADE
+	
+);
+
+
