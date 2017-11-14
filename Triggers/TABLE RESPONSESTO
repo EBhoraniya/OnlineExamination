@@ -1,0 +1,156 @@
+
+TRIGGER FOR RESPONSES TO:
+
+TRIGGER 1:
+
+CREATE TRIGGER update_trigger
+AFTER UPDATE
+ON onlineexam.responsesto
+FOR EACH ROW
+EXECUTE PROCEDURE onlineexam.update_result();
+
+CREATE OR REPLACE FUNCTION onlineexam.update_result()
+  RETURNS trigger AS
+$BODY$
+DECLARE
+rightAnsNew integer;
+wrongAnsNew integer;
+rightAnsOld integer;
+wrongAnsOld integer;
+res integer :=0;
+ai integer;
+ei integer;
+flg boolean := false;
+
+curs CURSOR for select studid,examid  from registration;
+
+BEGIN
+select count(correctoption) into rightAnsNew from (select * from responsesto as re join qset as qs on re.studid = NEW.studid and re.setid=qs.setid and re.setcode=qs.setcode and re.index=qs.index  ) as q join question as s
+on s.correctoption =NEW.response and q.questionid=s.questionid;
+
+select count(correctoption) into wrongAnsNew from (select * from responsesto as re join qset as qs on re.studid = NEW.studid and re.setid=qs.setid and re.setcode=qs.setcode and re.index=qs.index  ) as q join question as s
+on  s.correctoption !=NEW.response and q.questionid=s.questionid;
+
+select count(correctoption) into rightAnsOld from (select * from responsesto as re join qset as qs on re.studid = OLD.studid and re.setid=qs.setid and re.setcode=qs.setcode and re.index=qs.index ) as q join question as s
+on s.correctoption =OLD.response and q.questionid=s.questionid;
+
+select count(correctoption) into wrongAnsOld from (select * from responsesto as re join qset as qs on re.studid = OLD.studid and re.setid=qs.setid and re.setcode=qs.setcode and re.index=qs.index  ) as q join question as s
+on  s.correctoption !=OLD.response and q.questionid=s.questionid;
+
+
+res = rightAnsNew*4 - wrongAnsNew -rightAnsOld*4 + wrongAnsOld ;
+open curs;
+loop
+fetch curs into ei,ai;
+exit when not found;
+if ai = NEW.studid  then
+flg = true;
+end if;
+end loop;
+
+if flg = true then
+update registration
+ set result = res where  studid = NEW.studid;
+end if;
+close curs;
+RETURN NEW;
+END
+$BODY$
+  LANGUAGE plpgsql;
+
+
+TRIGGER 2:
+
+CREATE TRIGGER insert_trigger
+AFTER INSERT
+ON onlineexam.responsesto
+FOR EACH ROW
+EXECUTE PROCEDURE onlineexam.insert_result();
+
+
+CREATE OR REPLACE FUNCTION onlineexam.insert_result()
+RETURNS trigger AS
+$$
+DECLARE
+rightAnsNew integer;
+wrongAnsNew integer;
+rightAnsOld integer;
+wrongAnsOld integer;
+res integer :=0;
+ai integer;
+ei integer;
+flg boolean := false;
+curs CURSOR for select studid,examid  from registration;
+BEGIN
+select count(correctoption) into rightAnsNew from (select * from responsesto as re join qset as qs on re.studid = NEW.studid and re.setid=qs.setid and re.setcode=qs.setcode and re.index=qs.index  ) as q join question as s
+on s.correctoption =NEW.response and q.questionid=s.questionid;
+
+select count(correctoption) into wrongAnsNew from (select * from responsesto as re join qset as qs on re.studid = NEW.studid and re.setid=qs.setid and re.setcode=qs.setcode and re.index=qs.index  ) as q join question as s
+on  s.correctoption !=NEW.response and q.questionid=s.questionid;
+
+
+res = rightAnsNew*4 - wrongAnsNew +marks;
+open curs;
+loop
+fetch curs into ei,ai;
+exit when not found;
+if ai = new.studid then
+flg = true;
+end if;
+end loop;
+if flg = true then
+update registration set result = result + res where studid = new.studid;
+end if;
+close curs;
+RETURN NEW;
+END
+$$ LANGUAGE plpgsql ;
+
+
+TRIGGER 3:
+
+CREATE TRIGGER delete_trigger
+AFTER DELETE
+ON onlineexam.ResponsesTo
+FOR EACH ROW
+EXECUTE PROCEDURE onlineexam.delete_result();
+
+
+CREATE OR REPLACE FUNCTION onlineexam.delete_result()
+RETURNS trigger AS
+$$
+DECLARE
+rightAnsNew integer;
+wrongAnsNew integer;
+rightAnsOld integer;
+wrongAnsOld integer;
+res integer :=0;
+ai integer;
+ei integer;
+flg boolean := false;
+curs CURSOR for select studid,examid  from registration;
+BEGIN
+
+select count(correctoption) into rightAnsOld from (select * from responsesto as re join qset as qs on re.studid = OLD.studid and re.setid=qs.setid and re.setcode=qs.setcode and re.index=qs.index ) as q join question as s
+on s.correctoption =OLD.response and q.questionid=s.questionid;
+
+select count(correctoption) into wrongAnsOld from (select * from responsesto as re join qset as qs on re.studid = OLD.studid and re.setid=qs.setid and re.setcode=qs.setcode and re.index=qs.index  ) as q join question as s
+on  s.correctoption !=OLD.response and q.questionid=s.questionid;
+
+res =wrongAnsOld - rightAnsOld*4 +marks;
+open curs;
+loop
+fetch curs into ei,ai;
+exit when not found;
+if ai = new.studid then
+flg = true;
+end if;
+end loop;
+if flg = true then
+update registration set result = res +  result where studid = new.studid;
+end if;
+close curs;
+RETURN NEW;
+END
+$$ LANGUAGE plpgsql ;
+
