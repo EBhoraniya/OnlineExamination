@@ -1,0 +1,9 @@
+Name of top 10 students of maths of ‘ST’ category from ‘Gujarat’ 
+
+Ans: select g.fname, g.studid from 
+(select  count(questionid) as marks,studid from 
+(select c.studid, d.questionid from 
+(select  studid from student join category on categoryname = 'ST' join address on state='Gujarat')as a
+natural join responsesto as c natural join qset as f join question as d
+on d.correctoption=c.response and f.questionid=d.questionid join subject as e on e.subname='maths' and d.subjectid=e.subjectid ) as b 
+group by b.studid ) as h join student as g on g.studid=h.studid order by marks limit 10;
