@@ -1,0 +1,15 @@
+NUMBER of students who could solve all question of maths of JEE Main 2015
+
+
+Ans : select fname,mname,lname,studid from
+(select studid from
+ (select count(response) as total,studid from
+(select *from
+(select *from
+(select *from (select EXTRACT (YEAR FROM examdate) as y,examid  from exam)as a where a.y='2015')as b
+natural join exam natural join registration natural join responsesto natural join qset )as c
+join question as d on c.questionid=d.questionid and response=correctoption ) as d
+join subject on subname='maths' group by studid)as e where total=30)as f natural join student
+
+
+
