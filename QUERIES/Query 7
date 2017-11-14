@@ -1,0 +1,8 @@
+Subject wise number of  right attempted question of student id 1000001
+
+ans:
+select * from
+(select count(b.questionid)as rightattmpted,subjectid from 
+(select * from (select * from responsesto where studid='1000001') as a natural join qset) as b
+join question as c on b.questionid=c.questionid and response = correctoption group by subjectid)as z
+natural join subject
