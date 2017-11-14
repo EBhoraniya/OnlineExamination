@@ -1,0 +1,27 @@
+CREATE OR REPLACE FUNCTION onlineexam.result() RETURNS void AS
+$BODY$
+
+DECLARE
+stu registration%rowtype;
+righta integer;
+wrong integer;
+c1 CURSOR (sid integer,eid integer) is select count(*) from (select * from responsesto as r join qset as q on studid=sid and examid=eid and q.setid = r.setid and q.setcode=r.setcode and q.index=r.index) as s join  question as m on m.correctoption=s.response and s.questionid=m.questionid;
+c2 CURSOR (sid integer,eid integer) is select count(*) from (select * from responsesto as r join qset as q on studid=sid and examid=eid and q.setid = r.setid and q.setcode=r.setcode and q.index=r.index) as s join  question as m on m.correctoption !=s.response and s.questionid=m.questionid;
+
+BEGIN
+	For stu in SELECT * from registration Loop
+	open c1(stu.studid,stu.examid);
+	open c2(stu.studid,stu.examid);
+fetch c1 into righta;
+fetch c2 into wrong;
+
+UPDATE registration
+SET Result =( righta*4 - wrong) where studid=stu.studid and examid=stu.examid;
+
+close c1;
+close c2;
+END LOOP;
+
+END 
+$BODY$
+ LANGUAGE plpgsql
