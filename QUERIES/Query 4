@@ -1,0 +1,8 @@
+Total students absent in ahmedabad centers in JEE Main 2015
+
+
+Ans : select count(*) from
+(select a.examid from
+(select EXTRACT (YEAR FROM examdate) as y,examid  from exam)as a
+join registration as b on a.examid=b.examid and y=2015 and result is null)as c
+natural join conductedat natural join center  join address on city = 'Ahmedabad'
