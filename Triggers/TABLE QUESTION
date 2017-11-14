@@ -1,0 +1,107 @@
+CREATE TRIGGER update_trigger
+AFTER UPDATE
+ON onlineexam.Question
+FOR EACH ROW
+EXECUTE PROCEDURE onlineexam.update_resultAll();
+
+CREATE TRIGGER delete_trigger
+AFTER DELETE
+ON onlineexam.Question
+FOR EACH ROW
+EXECUTE PROCEDURE onlineexam.delete_resultAll();
+
+TRIGGER 1:
+
+CREATE OR REPLACE FUNCTION onlineexam.update_resultall()
+ RETURNS trigger AS
+$BODY$
+
+DECLARE
+
+sid integer;
+eid integer;
+rold char(1);
+cold char(1);
+
+curs CURSOR(qid integer) for select studid, examid, Response, correctOption from QSet join ResponsesTo ON qid=QuestionID;
+
+
+
+BEGIN
+ 
+	Open curs(NEW.QuestionID) ;
+	Loop
+	fetch curs into sid, eid, rold, cold;
+exit when not found; 
+IF NEW.correctOption = NULL THEN
+
+		IF rold = NULL THEN
+UPDATE Registration
+		SET result = result +4 where sid=studid and eid=examid;
+ELSIF rold != cold THEN
+UPDATE Registration
+		SET result = result +5 where sid=studid and eid=examid;
+		END IF;
+
+ELSIF cold != NEW.correctOption AND rold != NULL THEN
+	
+	IF rold=cold THEN
+
+			UPDATE Registration
+			SET result = result-5 where sid=studid and eid=examid;
+		ElsIF rold=NEW.correctOption THEN
+		UPDATE Registration
+			SET result = result + 5 where sid=studid and eid=examid;
+		END IF;
+	
+END IF;
+	
+END LOOP;
+
+close curs;
+
+RETURN NEW;
+
+END
+
+$BODY$
+
+  LANGUAGE plpgsql;
+
+
+
+TRIGGER 2:
+
+CREATE OR REPLACE FUNCTION onlineexam.delete_resultall()
+  RETURNS trigger AS
+$BODY$
+
+DECLARE
+sid integer;
+eid integer;
+rold char(1);
+cold char(1);
+
+curs CURSOR(qid integer) for select studid, examid, response from qset join ResponsesTo ON qid=QuestionID;
+
+BEGIN
+ 	Open curs(OLD.QuestionID) ;
+	loop
+	fetch curs into sid, eid, rold;
+exit when not found; 
+IF rold != NULL THEN
+		IF rold != OLD.CorrectOption THEN
+			UPDATE Registration
+			SET result = result+5 where sid=studid and eid=examid;
+		ELSE
+		UPDATE Registration
+			SET result = result - 5 where sid=studid and eid=examid;
+		END IF;
+	END IF;
+	END LOOP;
+close curs;
+
+RETURN NEW;
+END
+$BODY$
+ LANGUAGE plpgsql;
