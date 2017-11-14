@@ -1,0 +1,146 @@
+5.2 - ONLINE EXAMINATION 
+FUNCTIONAL DEPENDENCIES
+
+TABLE : STUDENT 
+
+StudentIDFName
+StudentIDMName
+StudentIDLName
+StudentIDDOB
+StudentIDemail
+StudentIDContactNo
+StudentIDGENDER
+StudentIDcategoryID
+StudentIDSchoolCode
+StudentIDpassword
+
+Here, Key is {StudentID}. So, Student table is in BCNF. 
+
+TABLE : AssignedTo
+
+{ExamID,CenterID,StudentID }SeatNo
+{ExamID,CenterID,StudentID }BlockNo
+
+Here, Key is {StudentID,ExamID,CenterID}. So, this table is in BCNF. 
+
+TABLE : Registration
+
+{ExamID,StudentID }Fees
+{ExamID,StudentID }Result
+
+Here, Key is {StudentID,ExamID}. So, this table is in BCNF. 
+
+
+
+TABLE : ResponsesTo
+
+{StudentID,SetID,SetCode,Index}  Respnose
+
+Here, Key is {StudentID,SetID,SetCode,Index}. So, this table is in BCNF. 
+
+TABLE : Set
+
+{SetID,SetCode,Index} ExamID
+{SetID,SetCode,Index} QuestionID	
+
+Here, Key is {SetID,SetCode,Index}. So, this table is in BCNF. 
+
+TABLE : Exam
+
+ExamID  ExamDate
+ExamID StartTime
+
+Here, Key is {ExamID}. So, this table is in BCNF. 
+
+TABLE : Question
+
+QuestionID  Content
+QuestionID  A
+QuestionID  B
+QuestionID  C
+QuestionID  D
+QuestionID  CorrectOption
+QuestionID  SetterID
+QuestionID  SubjectID
+
+Here, Key is {QuestionID}. So, this table is in BCNF. 
+
+
+
+
+
+TABLE : Setter
+
+SetterID  Name
+SetterID  Gender
+SetterID  SchoolID
+SetterID  AddressID
+
+Here, Key is {SetterID}. So, this table is in BCNF. 
+
+TABLE : SCHOOL
+
+SchoolID  SchoolName
+SchoolID  AddressID
+
+Here, Key is {SchoolID}. So, this table is in BCNF. 
+
+TABLE : SUBJECT
+
+SubjectID SubName
+
+Here, Key is {SubjectID}. So, this table is in BCNF. 
+
+TABLE : CUTOFF
+
+{ ExamID , CategoryID } CutoffMark
+
+Here, Key is { ExamID , CategoryID }. So, this table is in BCNF. 
+
+TABLE : SupervisedBy
+
+{ ExamID, CenterID , SupervisorID }  BlockNo
+
+Here, Key is { ExamID, CenterID , SupervisorID }. So, this table is in BCNF. 
+
+
+
+
+
+TABLE : Center
+
+CenterID  CenterName
+CenterID  AddressID
+CenterID  Capacity
+
+Here, Key is { CenterID }. So, this table is in BCNF. 
+
+TABLE : SUPERVISOR
+
+SupervisorID  Name
+SupervisorID  Gender
+SupervisorID  ContactNo
+SupervisorID  AddressId
+
+Here, Key is { SupervisorID }. So, this table is in BCNF. 
+
+TABLE : ADDRESS	
+
+AddressID  Street
+AddressID City
+AddressID District
+AddressID State
+AddressID PIN
+
+Here, Key is { AddressID }. So, this table is in BCNF. 
+
+TABLE : Category
+
+CategoryID  CategoryName
+CategoryID StudentID
+
+Here, Key is { CategoryID }. So, this table is in BCNF. 
+
+TABLE : CoductedAt
+
+No FDS avaliable
