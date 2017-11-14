@@ -1,0 +1,8 @@
+Student name, school name, and marks of rajkot city topper 
+
+
+Ans: select f.fname,f.categoryname,f.schoolname,f.result from
+(select * from (select d.result , d.studid from 
+( select * from (registration natural join student natural join address) where city='Rajkot') AS d 
+order by result desc LIMIT 1) as g natural join student as p join school as s on p.schoolcode=s.schoolcode natural join category)as f
+
