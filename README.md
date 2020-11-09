@@ -1,6 +1,6 @@
 ONLINE EXAMINATION
 
-As part of DBMS Project we tried cretae real life applicable database for Online exams like JEE.
+As part of DBMS Project we tried create real life applicable database for Online exams like JEE.
 It includes:
 
 ER Diagram
